@@ -18,6 +18,7 @@ class AppRemoteDataSourceImpl extends AppRemoteDataSource {
       InterceptorsWrapper(
         onRequest: (options, handler) {
           debugPrint('Request: ${options.method} ${options.path}');
+          debugPrint('Request URL: ${options.uri}');
           handler.next(options);
         },
         onResponse: (response, handler) {
@@ -34,12 +35,17 @@ class AppRemoteDataSourceImpl extends AppRemoteDataSource {
 
 
   @override
-  Future<Map<String, dynamic>> getSearchedBooks(String title) async {
+  Future<Map<String, dynamic>> getSearchedBooks(
+      String title,
+      int offset,
+      int page) async {
     try {
       final response = await _dio.get(
         '/search.json',
         queryParameters: {
-          'title': title
+          'title': title,
+          'offset': offset,
+          'page': page
         },
       );
       return response.data;

@@ -7,10 +7,13 @@ class BookRepositoryImpl extends BookRepository {
   BookRepositoryImpl({required this.remoteDataSource});
 
   @override
-  Future<Result<dynamic>> searchBooks(String title) async {
+  Future<Result<dynamic>> searchBooks(
+      String title,
+      int offset,
+      int page ) async {
     try{
-      final response = await remoteDataSource.getSearchedBooks(title);
-      final List<dynamic> bookJson = response['docs'] ?? [];
+      final response = await remoteDataSource.getSearchedBooks(title, offset, page);
+      final dynamic bookJson = response;
       return Result.success(bookJson);
     } catch(e) {
       return Result.failure(e.toString());

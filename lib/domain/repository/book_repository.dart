@@ -8,5 +8,5 @@ class Result<T> {
 }
 
 abstract class BookRepository {
-  Future<Result<dynamic>> searchBooks(String title);
+  Future<Result<dynamic>> searchBooks(String title, int offset, int page);
 }

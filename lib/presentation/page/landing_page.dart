@@ -15,6 +15,53 @@ class LandingPage extends StatefulWidget {
 }
 class _LandingPageState extends State<LandingPage> {
   List<dynamic> booksList = [];
+  String searchTitle = '';
+  int currentPage = 1;
+  bool isLoadingMore = false;
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    final cubit = context.read<BooksCubit>();
+
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200
+        && !isLoadingMore
+        && cubit.hasMore
+    ) {
+      _loadMoreBooks();
+    }
+  }
+
+  void _loadMoreBooks() async {
+    final cubit = context.read<BooksCubit>();
+    final currentState = cubit.state;
+    final currentPage = currentState is BooksLoaded
+        ? cubit.currentPage : 1;
+
+    setState(() {
+      isLoadingMore = true;
+    });
+
+    await context
+        .read<BooksCubit>()
+        .onSearchBooks(title: searchTitle, page: currentPage + 1,);
+
+    setState(() {
+      isLoadingMore = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +79,10 @@ class _LandingPageState extends State<LandingPage> {
         SearchBoxWithAction(
           hintText: "Search Books with Title",
           onSearch: (search) {
+            setState(() {
+              searchTitle = search;
+            });
+
             context
                 .read<BooksCubit>()
                 .onSearchBooks(title: search);
@@ -61,11 +112,12 @@ class _LandingPageState extends State<LandingPage> {
 
                   if( state is BooksLoaded) {
                     booksList = state.books;
+                    debugPrint("Booklist size: ${booksList.length}");
                   }
 
                   if(state is BooksFailure) {
                     debugPrint("Search Books Failed: ${state.error}");
-                    return Center(
+                    /*return Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -76,14 +128,24 @@ class _LandingPageState extends State<LandingPage> {
                           ),
                         ],
                       ),
-                    );
+                    );*/
                   }
 
                   if(booksList.isNotEmpty) {
                     // Book list view
                     return ListView.builder(
-                      itemCount: booksList.length ,
+                      controller: _scrollController,
+                      itemCount: booksList.length + 1,
                       itemBuilder: (context, index) {
+                        if(index == booksList.length) {
+                          return isLoadingMore ?
+                          Padding(
+                            padding: EdgeInsets.all(8.w),
+                            child: Center(child: CircularProgressIndicator(),),
+                          )
+                              : SizedBox.shrink();
+                        }
+
                         final book = booksList[index];
                         return BookListWidget(book: book);
                       },
