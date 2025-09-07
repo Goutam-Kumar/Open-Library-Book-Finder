@@ -26,7 +26,11 @@ class BookDetailsCubit extends Cubit<BookDetailsState> {
     final result = await booksRepository.getBookById(bookCoverId);
 
     if(result.isSuccess) {
-      emit(BookDetailsCaptured(book: result.data));
+      if(result.data != null) {
+        emit(BookDetailsCaptured(book: result.data));
+      } else {
+        emit(BookDetailsError(error: "Book not found"));
+      }
     } else {
       emit(BookDetailsError(error: result.error!));
     }

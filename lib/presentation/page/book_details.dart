@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:book_finder/config/color/palette.dart';
 import 'package:book_finder/locale/app_locale.dart';
 import 'package:book_finder/presentation/cubit/book_details/book_details_cubit.dart';
@@ -16,8 +18,12 @@ class BookDetails extends StatefulWidget {
   State<BookDetails> createState() => _BookDetailsState();
 }
 
-class _BookDetailsState extends State<BookDetails> {
+class _BookDetailsState
+    extends State<BookDetails>
+    with SingleTickerProviderStateMixin {
+
   bool isSavingDisabled = true;
+  late final AnimationController _controller;
 
   @override
   void initState() {
@@ -27,7 +33,17 @@ class _BookDetailsState extends State<BookDetails> {
 
   void _init() {
     context.read<BookDetailsCubit>()
-        .getBookById(widget.selectedBook['cover_i']);
+        .getBookById(widget.selectedBook['cover_i'] ?? 0);
+    _controller = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: 10),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -41,28 +57,40 @@ class _BookDetailsState extends State<BookDetails> {
   }
 
   Widget _buildBookDetails() {
+    final coverImage = widget.selectedBook['cover_i'].toString();
+    final imageUrl = 'https://covers.openlibrary.org/b/id/$coverImage-M.jpg';
+
     return Column(
       children: [
         // Cover Image of the Book
-        Container(
-          color: Palette.primaryBlue.shade50,
+        Padding(
+          padding: EdgeInsets.only(top: 40.h),
           child: AspectRatio(
             aspectRatio: 16 / 9,
-            child: CachedNetworkImage(
-              imageUrl: 'https://covers.openlibrary.org/b/id/${widget.selectedBook['cover_i']}-M.jpg',
-              fit: BoxFit.contain,
-              placeholder: (context, url) => Container(
-                color: Colors.grey[300],
-                child: Center(child: CircularProgressIndicator()),
-              ),
-              errorWidget: (context, url, error) => Container(
-                color: Colors.grey[300],
-                child: Icon(Icons.image_not_supported, color: Colors.grey[600]),
+            child: AnimatedBuilder(
+              animation: _controller,
+              builder: (context, child) {
+                return Transform.rotate(
+                  angle: _controller.value * 2 * math.pi,
+                  child: child,
+                );
+              },
+              child: CachedNetworkImage(
+                imageUrl: imageUrl,
+                fit: BoxFit.contain,
+                placeholder: (context, url) => Container(
+                  color: Colors.grey[300],
+                  child: Center(child: CircularProgressIndicator()),
+                ),
+                errorWidget: (context, url, error) => Container(
+                  color: Colors.grey[300],
+                  child: Icon(Icons.image_not_supported, color: Colors.grey[600]),
+                ),
               ),
             ),
           ),
         ),
-        SizedBox(height: 16.h),
+        SizedBox(height: 50.h),
 
         Expanded(
             child: Column(
@@ -111,6 +139,10 @@ class _BookDetailsState extends State<BookDetails> {
 
                     if(state is BookDetailsSaved) {
                       isSavingDisabled = true;
+                    }
+
+                    if(state is BookDetailsError) {
+                      isSavingDisabled = false;
                     }
 
                     return Padding(
