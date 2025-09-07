@@ -9,4 +9,6 @@ class Result<T> {
 
 abstract class BookRepository {
   Future<Result<dynamic>> searchBooks(String title, int offset, int page);
+  Future<Result<int>> addBook(Map<String, dynamic> book);
+  Future<Result<Map<String, dynamic>? >> getBookById(int bookCoverId);
 }

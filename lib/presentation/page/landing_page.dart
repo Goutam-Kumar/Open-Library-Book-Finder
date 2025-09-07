@@ -1,11 +1,13 @@
+import 'package:book_finder/config/router/app_routes.dart';
 import 'package:book_finder/locale/app_locale.dart';
 import 'package:book_finder/presentation/cubit/books/books_cubit.dart';
-import 'package:book_finder/presentation/widget/book_list_widget.dart';
-import 'package:book_finder/presentation/widget/book_shimmer_widget.dart';
-import 'package:book_finder/presentation/widget/search_box_with_action.dart';
+import 'package:book_finder/presentation/widget/landing_page/book_list_widget.dart';
+import 'package:book_finder/presentation/widget/landing_page/book_shimmer_widget.dart';
+import 'package:book_finder/presentation/widget/landing_page/search_box_with_action.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 
 class LandingPage extends StatefulWidget {
   const LandingPage({super.key});
@@ -157,7 +159,16 @@ class _LandingPageState extends State<LandingPage> {
                           }
 
                           final book = booksList[index];
-                          return BookListWidget(book: book);
+                          return BookListWidget(
+                              book: book,
+                            onBookSelected: (book) {
+                                //Navigate to Book Details
+                                context.push(
+                                    AppRoutes.bookDetailsPagePath,
+                                    extra: book
+                                );
+                            },
+                          );
                         },
                       ),
                     );

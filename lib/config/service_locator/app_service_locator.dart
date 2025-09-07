@@ -1,3 +1,5 @@
+import 'package:book_finder/data/datasource/app_offline_datasource.dart';
+import 'package:book_finder/data/datasource/app_offline_datasource_impl.dart';
 import 'package:book_finder/data/datasource/app_remote_datasource.dart';
 import 'package:book_finder/data/datasource/app_remote_datasource_impl.dart';
 import 'package:book_finder/data/repository/book_repository_impl.dart';
@@ -14,8 +16,15 @@ Future<void> serviceLocator() async {
           () => AppRemoteDataSourceImpl()
   );
 
+  sl.registerLazySingleton<AppOfflineDataSource>(
+          () => AppOfflineDatasourceImpl()
+  );
+
   sl.registerLazySingleton<BookRepository>(
-          () => BookRepositoryImpl(remoteDataSource: sl.call())
+          () => BookRepositoryImpl(
+          remoteDataSource: sl.call(),
+          offlineDataSource: sl.call()
+      )
   );
 
   sl.registerFactory<BooksCubit>(
