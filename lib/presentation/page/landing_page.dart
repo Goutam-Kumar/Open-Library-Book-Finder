@@ -132,23 +132,34 @@ class _LandingPageState extends State<LandingPage> {
                   }
 
                   if(booksList.isNotEmpty) {
-                    // Book list view
-                    return ListView.builder(
-                      controller: _scrollController,
-                      itemCount: booksList.length + 1,
-                      itemBuilder: (context, index) {
-                        if(index == booksList.length) {
-                          return isLoadingMore ?
-                          Padding(
-                            padding: EdgeInsets.all(8.w),
-                            child: Center(child: CircularProgressIndicator(),),
-                          )
-                              : SizedBox.shrink();
-                        }
-
-                        final book = booksList[index];
-                        return BookListWidget(book: book);
+                    // Pull to refresh
+                    return RefreshIndicator(
+                      onRefresh: () async {
+                        await context
+                            .read<BooksCubit>()
+                            .onSearchBooks(
+                              title: searchTitle,
+                              page: 1
+                            );
                       },
+                      // Book list view
+                      child: ListView.builder(
+                        controller: _scrollController,
+                        itemCount: booksList.length + 1,
+                        itemBuilder: (context, index) {
+                          if(index == booksList.length) {
+                            return isLoadingMore ?
+                            Padding(
+                              padding: EdgeInsets.all(8.w),
+                              child: Center(child: CircularProgressIndicator(),),
+                            )
+                                : SizedBox.shrink();
+                          }
+
+                          final book = booksList[index];
+                          return BookListWidget(book: book);
+                        },
+                      ),
                     );
 
                   } else {
