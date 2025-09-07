@@ -29,8 +29,8 @@ class DatabaseHelper {
 
     await db.execute('''
       CREATE TABLE $_tableName (
-        id $idType
-        title $textType
+        id $idType,
+        title $textType,
         authors $textType
       )
     ''');

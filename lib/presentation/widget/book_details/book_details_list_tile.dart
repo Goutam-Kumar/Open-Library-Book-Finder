@@ -16,15 +16,24 @@ class BookDetailsListTile extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            tileKey,
-            style: _boldBodyTextStyle,
-            maxLines: 2,
+          Expanded(
+            flex: 2,
+            child: Text(
+                tileKey,
+                style: _boldBodyTextStyle,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis
+            ),
           ),
-          Text(
-            value,
-            style: _normalBodyTextStyle,
-            maxLines: 4,
+          SizedBox(width: 8.w,),
+          Expanded(
+            flex: 8,
+            child: Text(
+                value,
+                style: _normalBodyTextStyle,
+                maxLines: 4,
+                overflow: TextOverflow.ellipsis
+            ),
           )
         ],
       ),

@@ -1,4 +1,5 @@
 import 'package:book_finder/config/router/app_routers.dart';
+import 'package:book_finder/presentation/cubit/book_details/book_details_cubit.dart';
 import 'package:book_finder/presentation/cubit/books/books_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -26,6 +27,7 @@ Future<void> main() async {
 List<SingleChildWidget> _createBlocProviders() {
   return [
     BlocProvider(create: (context) => di.sl<BooksCubit>()),
+    BlocProvider(create: (context) => di.sl<BookDetailsCubit>()),
   ];
 }
 
